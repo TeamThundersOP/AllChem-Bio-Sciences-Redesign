@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AllChem Bio Sciences"
+description = "A modern corporate website for AllChem Bio Sciences featuring its poultry, aqua, and veterinary product ranges, company story, and contact information for distributors and partners."
+version = "1.0.0"
+id = "artifacts/allchem-website"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24718
+
+[services.development]
+run = "pnpm --filter @workspace/allchem-website run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/allchem-website", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/allchem-website/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24718"
+BASE_PATH = "/"
