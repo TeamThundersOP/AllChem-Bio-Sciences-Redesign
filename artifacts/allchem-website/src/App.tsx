@@ -88,6 +88,14 @@ const categoryDetails: Record<Category, { eyebrow: string; description: string }
 
 const categories: Category[] = ['All', 'Poultry', 'Aqua', 'Veterinary', 'Swine', 'Equine', 'Pet'];
 
+function productImagePath(product: Product) {
+  const imageName = `${product.category}-${product.name}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return `${import.meta.env.BASE_URL}products/${imageName}.jpg`;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -237,8 +245,13 @@ function Home() {
           </div>
           <div className="mb-8 flex items-center justify-between"><p data-testid="text-catalogue-description" className="text-sm text-[#65706c]">{categoryDetails[category].description}</p><span className="mono-face text-[10px] text-[#9b7a2d]">{filteredProducts.length} products</span></div>
           {filteredProducts.length > 0 ? <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredProducts.map((product, index) => <button key={`${product.category}-${product.name}-${index}`} data-testid={`card-product-${product.name.replaceAll(' ', '-').toLowerCase()}`} onClick={() => setSelectedProduct(product)} className="product-card focus-ring group min-h-[154px] border border-[#ded8ca] bg-[#fbf8f0] p-5 text-left">
-              <div className="flex items-start justify-between gap-3"><span className="mono-face text-[9px] uppercase tracking-[.12em] text-[#9b7a2d]">{product.category}</span><ArrowUpRight size={15} className="text-[#9b7a2d] opacity-0 transition-opacity group-hover:opacity-100" /></div><h3 className="mt-7 text-sm font-extrabold leading-5 tracking-[.02em] text-[#1c2832]">{product.name}</h3><p className="mt-2 text-xs text-[#7c827c]">{product.note}</p>
+            {filteredProducts.map((product, index) => <button key={`${product.category}-${product.name}-${index}`} data-testid={`card-product-${product.name.replaceAll(' ', '-').toLowerCase()}`} onClick={() => setSelectedProduct(product)} className="product-card focus-ring group overflow-hidden border border-[#ded8ca] bg-[#fbf8f0] text-left">
+              <div className="image-wrap relative aspect-[1.55/1] overflow-hidden border-b border-[#ded8ca] bg-[#eee9df]">
+                <img src={productImagePath(product)} alt={`${product.name} product pack`} loading="lazy" className="image-hover h-full w-full object-contain px-3 py-2 mix-blend-multiply" />
+              </div>
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-3"><span className="mono-face text-[9px] uppercase tracking-[.12em] text-[#9b7a2d]">{product.category}</span><ArrowUpRight size={15} className="text-[#9b7a2d] opacity-0 transition-opacity group-hover:opacity-100" /></div><h3 className="mt-4 text-sm font-extrabold leading-5 tracking-[.02em] text-[#1c2832]">{product.name}</h3><p className="mt-2 text-xs text-[#7c827c]">{product.note}</p>
+              </div>
             </button>)}
           </div> : <div className="border border-dashed border-[#bdb7a9] bg-[#efeade] px-6 py-14 text-center"><Minus className="mx-auto text-[#9b7a2d]" size={24} /><h3 className="mt-5 text-lg font-bold text-[#1c2832]">This range is taking shape.</h3><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#65706c]">{categoryDetails[category].description} Speak with our team for current availability and upcoming launches.</p><button data-testid="button-empty-contact" onClick={() => openContact(`${category} healthcare`)} className="focus-ring mt-6 inline-flex items-center gap-2 bg-[#1c2832] px-4 py-3 text-[10px] font-extrabold uppercase tracking-[.14em] text-[#f7f1e5]">Ask about {category} <ArrowUpRight size={14} /></button></div>}
         </div>
@@ -264,7 +277,7 @@ function Home() {
         <div className="mx-auto flex max-w-[1320px] flex-col justify-between gap-7 md:flex-row md:items-end"><div><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center border border-[#d8ad45] text-[#d8ad45]"><FlaskConical size={16} /></span><span className="text-xs font-extrabold tracking-[.16em]">ALLCHEM BIO SCIENCES</span></div><p className="mt-4 max-w-sm text-xs leading-5 text-[#aeb8b3]">Regulated animal healthcare, made practical from Hyderabad.</p></div><p className="mono-face text-[9px] uppercase tracking-[.16em] text-[#87928f]">© {new Date().getFullYear()} AllChem Bio Sciences</p></div>
       </footer>
 
-      {selectedProduct && <div className="fixed inset-0 z-50 grid place-items-center bg-[#1c2832]/75 p-5" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} details`}><div className="relative w-full max-w-md border border-[#d9d3c6] bg-[#f7f3e9] p-7 md:p-9"><button data-testid="button-close-product" onClick={() => setSelectedProduct(null)} className="focus-ring absolute right-5 top-5 text-[#65706c] hover:text-[#1c2832]" aria-label="Close product details"><X size={19} /></button><span className="mono-face text-[10px] uppercase tracking-[.2em] text-[#9b7a2d]">{selectedProduct.category} / Product range</span><h2 className="display-face mt-7 text-4xl leading-none text-[#1c2832]">{selectedProduct.name}</h2><p className="mt-5 text-sm leading-6 text-[#65706c]">{selectedProduct.note}. For pack sizes, technical information, current availability or distribution support, connect with our team.</p><button data-testid="button-enquire-product" onClick={() => { setSelectedProduct(null); openContact(selectedProduct.name); }} className="focus-ring mt-8 inline-flex items-center gap-3 bg-[#1c2832] px-5 py-3.5 text-xs font-extrabold uppercase tracking-[.14em] text-[#f7f1e5]">Enquire about this product <ArrowUpRight size={15} /></button></div></div>}
+      {selectedProduct && <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#1c2832]/75 p-5" role="dialog" aria-modal="true" aria-label={`${selectedProduct.name} details`}><div className="relative my-auto w-full max-w-lg border border-[#d9d3c6] bg-[#f7f3e9] p-6 md:p-8"><button data-testid="button-close-product" onClick={() => setSelectedProduct(null)} className="focus-ring absolute right-5 top-5 z-10 text-[#65706c] hover:text-[#1c2832]" aria-label="Close product details"><X size={19} /></button><div className="mb-7 aspect-[1.7/1] overflow-hidden border border-[#ded8ca] bg-[#eee9df]"><img src={productImagePath(selectedProduct)} alt={`${selectedProduct.name} product pack`} className="h-full w-full object-contain p-4 mix-blend-multiply" /></div><span className="mono-face text-[10px] uppercase tracking-[.2em] text-[#9b7a2d]">{selectedProduct.category} / Product range</span><h2 className="display-face mt-4 text-4xl leading-none text-[#1c2832]">{selectedProduct.name}</h2><p className="mt-5 text-sm leading-6 text-[#65706c]">{selectedProduct.note}. For pack sizes, technical information, current availability or distribution support, connect with our team.</p><button data-testid="button-enquire-product" onClick={() => { setSelectedProduct(null); openContact(selectedProduct.name); }} className="focus-ring mt-8 inline-flex items-center gap-3 bg-[#1c2832] px-5 py-3.5 text-xs font-extrabold uppercase tracking-[.14em] text-[#f7f1e5]">Enquire about this product <ArrowUpRight size={15} /></button></div></div>}
     </main>
   );
 }
